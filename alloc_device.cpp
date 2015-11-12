@@ -35,7 +35,6 @@
 #include "framebuffer_device.h"
 
 #define GRALLOC_ALIGN( value, base ) (((value) + ((base) - 1)) & ~((base) - 1))
-#define GRALLOC_USAGE_AML_VIDEO_OVERLAY GRALLOC_USAGE_PRIVATE_0
 
 #if GRALLOC_SIMULATE_FAILURES
 #include <cutils/properties.h>
@@ -101,7 +100,7 @@ static int gralloc_alloc_buffer(alloc_device_t *dev, size_t size, int usage, buf
 
         if ((usage & GRALLOC_USAGE_SW_READ_MASK) == GRALLOC_USAGE_SW_READ_OFTEN )
             ion_flags = ION_FLAG_CACHED | ION_FLAG_CACHED_NEEDS_SYNC;
-        if (usage & GRALLOC_USAGE_PRIVATE_1) {
+        if (usage & GRALLOC_USAGE_AML_DMA_BUFFER) {
             ret = ion_alloc(m->ion_client, size, 0, ION_HEAP_CARVEOUT_MASK, ion_flags, &ion_hnd);
         } else {
             ret = ion_alloc(m->ion_client, size, 0, ION_HEAP_SYSTEM_MASK, ion_flags, &ion_hnd);
@@ -399,7 +398,7 @@ static int alloc_device_alloc(alloc_device_t *dev, int w, int h, int format, int
             case HAL_PIXEL_FORMAT_YCbCr_420_P:
 #endif
                 stride = GRALLOC_ALIGN(w, 16);
-                if (usage & GRALLOC_USAGE_PRIVATE_1) {
+                if (usage & GRALLOC_USAGE_AML_DMA_BUFFER) {
 
                     /************************************************************
                      *
@@ -547,11 +546,11 @@ static int alloc_device_alloc(alloc_device_t *dev, int w, int h, int format, int
             hnd->flags |= private_handle_t::PRIV_FLAGS_VIDEO_OVERLAY;
 
         }
-        if (usage & GRALLOC_USAGE_PRIVATE_1)
+        if (usage & GRALLOC_USAGE_AML_DMA_BUFFER)
         {
             hnd->flags |= private_handle_t::PRIV_FLAGS_OSD_VIDEO_OMX;
         }
-        if (usage & GRALLOC_USAGE_PRIVATE_2)
+        if (usage & GRALLOC_USAGE_AML_OMX_OVERLAY)
         {
             private_handle_t* hnd = (private_handle_t*)(*pHandle);
             hnd->flags |= private_handle_t::PRIV_FLAGS_VIDEO_OMX;
@@ -574,8 +573,8 @@ static int alloc_device_alloc(alloc_device_t *dev, int w, int h, int format, int
     }
 
     private_handle_t *hnd = (private_handle_t *)*pHandle;
-    int               private_usage = usage & (GRALLOC_USAGE_PRIVATE_0 |
-            GRALLOC_USAGE_PRIVATE_1);
+    int               private_usage = usage & (GRALLOC_USAGE_AML_OMX_OVERLAY |
+            GRALLOC_USAGE_AML_DMA_BUFFER);
 
     if (usage & GRALLOC_USAGE_AML_VIDEO_OVERLAY)
     {
