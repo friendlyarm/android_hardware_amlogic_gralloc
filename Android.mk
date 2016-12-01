@@ -15,10 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 LOCAL_PATH := $(call my-dir)
 
-MESON_GRALLOC_DIR?=$(LOCAL_PATH)
+MESON_GRALLOC_DIR ?= $(LOCAL_PATH)
 ifeq ($(MESON_GRALLOC_DIR),$(LOCAL_PATH))
 
 #framebuffer apis
@@ -47,18 +46,19 @@ include $(CLEAR_VARS)
 LOCAL_PRELINK_MODULE := false
 LOCAL_MODULE_RELATIVE_PATH := hw
 
-LOCAL_MODULE := gralloc.amlogic
+LOCAL_MODULE := gralloc.$(TARGET_DEVICE)
 #LOCAL_MODULE_TAGS := optional
 
 #LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\" -DGRALLOC_32_BITS -DSTANDARD_LINUX_SCREEN
-LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\" -DGRALLOC_32_BITS  -DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+LOCAL_CFLAGS := -DLOG_TAG=\"gralloc\" -DGRALLOC_32_BITS \
+    -DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
 
 USING_ION=true
 ifeq ($(USING_ION),true)
 SHARED_MEM_LIBS := libion
 LOCAL_C_INCLUDES += system/core/libion/include/ \
 		system/core/libion/kernel-headers
-LOCAL_CFLAGS+= -DUSING_ION=1
+LOCAL_CFLAGS += -DUSING_ION=1
 
 else
 SHARED_MEM_LIBS := libUMP
